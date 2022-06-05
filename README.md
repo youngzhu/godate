@@ -1,4 +1,4 @@
 # godate
 
 ## License
-[BSD 3-Clause license](https://opensource.org/licenses/BSD-3-Clause), the same as the Go language. 
+[BSD-3-Clause license](./LICENSE), the same as the [Golang](https://github.com/golang/go). 
