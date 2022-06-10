@@ -30,10 +30,10 @@ func Today() Date {
 	return NewDate()
 }
 
-func (d Date) Year() int {
-	return d.Time.Year()
-}
-
 func (d Date) String() string {
 	return d.Format(layoutDate0)
+}
+
+func (d Date) Month() Month {
+	return Month(d.Time.Month())
 }

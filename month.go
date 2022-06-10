@@ -50,15 +50,28 @@ var longMonthNames = []string{
 	"December",
 }
 
-//func (d Date) Month() int {
-//	d.
-//	return d.Time.Month().String()
-//}
-
 // String returns the English name of the month ("January", "February", ...).
 func (m Month) String() string {
 	if January <= m && m <= December {
 		return longMonthNames[m-1]
 	}
 	return fmt.Sprintf("!Month(\"%d\")", m)
+}
+
+func (m Month) LongName() string {
+	if January <= m && m <= December {
+		return longMonthNames[m-1]
+	}
+	return fmt.Sprintf("!Month(\"%d\")", m)
+}
+
+func (m Month) ShortName() string {
+	if January <= m && m <= December {
+		return shortMonthNames[m-1]
+	}
+	return fmt.Sprintf("!Month(\"%d\")", m)
+}
+
+func (m Month) IntValue() int {
+	return int(m)
 }
