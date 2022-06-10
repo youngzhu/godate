@@ -15,6 +15,8 @@ func NewDate() Date {
 	return Date{time.Now()}
 }
 
+// NewDateYMD
+// month: 1-12
 func NewDateYMD(year, month, day int) (Date, error) {
 	s := fmt.Sprintf("%4d-%02d-%02d", year, month, day)
 	date, err := time.Parse(layoutDate0, s)
@@ -22,6 +24,14 @@ func NewDateYMD(year, month, day int) (Date, error) {
 		return Date{}, err
 	}
 	return Date{date}, nil
+}
+
+func Today() Date {
+	return NewDate()
+}
+
+func (d Date) Year() int {
+	return d.Time.Year()
 }
 
 func (d Date) String() string {
