@@ -42,7 +42,7 @@ const (
 	Day = time.Hour * 24
 )
 
-// AddDay returns the time d+days.
+// AddDay returns the date d+days.
 func (d Date) AddDay(days int) (Date, error) {
 	switch {
 	case days < 0:
@@ -51,6 +51,18 @@ func (d Date) AddDay(days int) (Date, error) {
 		return d, nil
 	default:
 		return Date{d.Time.Add(Day * time.Duration(days))}, nil
+	}
+}
+
+// SubDay returns the date d-days.
+func (d Date) SubDay(days int) (Date, error) {
+	switch {
+	case days < 0:
+		return Date{}, fmt.Errorf("days<0, use d.AddDay()")
+	case days == 0:
+		return d, nil
+	default:
+		return Date{d.Time.Add(Day * time.Duration(-days))}, nil
 	}
 }
 

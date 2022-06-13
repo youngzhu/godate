@@ -40,3 +40,22 @@ func TestDate_AddDay(t *testing.T) {
 		}
 	}
 }
+
+var subDayTests = []struct {
+	date   Date
+	days   int
+	result Date
+}{
+	{newDateYMD(2022, 6, 18), 0, newDateYMD(2022, 6, 18)},
+	{newDateYMD(2022, 6, 18), 1, newDateYMD(2022, 6, 17)},
+	{newDateYMD(2022, 6, 18), 2, newDateYMD(2022, 6, 16)},
+}
+
+func TestDate_SubDay(t *testing.T) {
+	for _, tt := range subDayTests {
+		date, _ := tt.date.SubDay(tt.days)
+		if !date.IsTheSameDay(tt.result) {
+			t.Errorf("got %s; want %s", date, tt.result)
+		}
+	}
+}
