@@ -11,8 +11,12 @@ type Date struct {
 	time.Time
 }
 
-func NewDate() Date {
+func today() Date {
 	return Date{time.Now()}
+}
+
+func NewDate() Date {
+	return today()
 }
 
 // NewDateYMD
@@ -27,7 +31,7 @@ func NewDateYMD(year, month, day int) (Date, error) {
 }
 
 func Today() Date {
-	return NewDate()
+	return today()
 }
 
 func (d Date) String() string {
