@@ -5,6 +5,8 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+    
+  workflow_dispatch:
 
 jobs:
 
@@ -24,4 +26,4 @@ jobs:
         go-version: ${{ matrix.go-version }}
 
     - name: Test
-      run: go test -v ./...
+      run: go test ./... -v -cover
