@@ -11,8 +11,12 @@ type Date struct {
 	time.Time
 }
 
-func NewDate() Date {
+func today() Date {
 	return Date{time.Now()}
+}
+
+func NewDate() Date {
+	return today()
 }
 
 // NewDateYMD
@@ -27,7 +31,7 @@ func NewDateYMD(year, month, day int) (Date, error) {
 }
 
 func Today() Date {
-	return NewDate()
+	return today()
 }
 
 func (d Date) String() string {
@@ -36,4 +40,46 @@ func (d Date) String() string {
 
 func (d Date) Month() Month {
 	return Month(d.Time.Month())
+}
+
+const (
+	Day = time.Hour * 24
+)
+
+// AddDay returns the date d+days.
+func (d Date) AddDay(days int) (Date, error) {
+	switch {
+	case days < 0:
+		return Date{}, fmt.Errorf("days<0, use d.SubDay()")
+	case days == 0:
+		return d, nil
+	default:
+		return Date{d.Time.Add(Day * time.Duration(days))}, nil
+	}
+}
+
+// SubDay returns the date d-days.
+func (d Date) SubDay(days int) (Date, error) {
+	switch {
+	case days < 0:
+		return Date{}, fmt.Errorf("days<0, use d.AddDay()")
+	case days == 0:
+		return d, nil
+	default:
+		return Date{d.Time.Add(Day * time.Duration(-days))}, nil
+	}
+}
+
+// MonthDay returns the day of the month specified by d.
+func (d Date) MonthDay() int {
+	return d.Time.Day()
+}
+
+// Weekday returns the day of the week specified by d.
+func (d Date) Weekday() Weekday {
+	return Weekday(d.Time.Weekday())
+}
+
+func (d Date) IsTheSameDay(dd Date) bool {
+	return d.Year() == dd.Year() && d.Month() == dd.Month() && d.Day() == dd.Day()
 }

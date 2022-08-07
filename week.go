@@ -42,3 +42,38 @@ func (d Weekday) String() string {
 	}
 	return fmt.Sprintf("!Weekday(\"%d\")", d)
 }
+
+func (d Date) Workdays() (workdays []Date) {
+	w := d.Weekday()
+	switch w {
+	case Sunday:
+		for i := Monday; i <= Friday; i++ {
+			day, _ := d.AddDay(int(i))
+			workdays = append(workdays, day)
+		}
+	case Saturday:
+		for i := Friday; i >= Monday; i-- {
+			day, _ := d.SubDay(int(i))
+			workdays = append(workdays, day)
+		}
+	default:
+		workdays = make([]Date, 5)
+
+		wi := int(w) - 1
+		workdays[wi] = d
+
+		before, after := int(w-Monday), int(Friday-w)
+		for before > 0 {
+			day, _ := d.SubDay(before)
+			workdays[wi-before] = day
+			before--
+		}
+
+		for after > 0 {
+			day, _ := d.AddDay(after)
+			workdays[wi+after] = day
+			after--
+		}
+	}
+	return
+}
