@@ -3,6 +3,8 @@ package godate
 import (
 	"fmt"
 	"regexp"
+	"strconv"
+	"strings"
 )
 
 // 日期转换
@@ -14,17 +16,32 @@ var layouts = []string{
 
 func ParseString(s string) (Date, error) {
 	var (
-		year  int = -1
+		year  int
 		month Month
 		day   int
 	)
 
-	var validDate = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})`)
+	var validDate = regexp.MustCompile(`\d{4}-\d{2}-\d{2}`)
 	if validDate.MatchString(s) {
-		//s := validDate.FindAllString(s, -1)
-		s := validDate.Split(`-`, -1)
-		//s:=validDate.
-		fmt.Println(s)
+		values := strings.Split(s, "-")
+		//fmt.Println(values)
+		y, err := strconv.ParseInt(values[0], 10, 32)
+		if err != nil {
+			return Date{}, fmt.Errorf("invalid year: %s", values[0])
+		}
+		year = int(y)
+
+		m, err := strconv.ParseInt(values[1], 10, 32)
+		if err != nil {
+			return Date{}, fmt.Errorf("invalid month: %s", values[1])
+		}
+		month = Month(m)
+
+		d, err := strconv.ParseInt(values[2], 10, 32)
+		if err != nil {
+			return Date{}, fmt.Errorf("invalid year: %s", values[2])
+		}
+		day = int(d)
 	}
 
 	return NewDateYMD(year, int(month), day)

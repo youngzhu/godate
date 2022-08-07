@@ -12,8 +12,11 @@ var parseTestCases = []struct {
 
 func TestParseString(t *testing.T) {
 	for _, tc := range parseTestCases {
-		date, _ := ParseString(tc.input)
-		got := date.Format("2006-01-02")
+		date, err := ParseString(tc.input)
+		if err != nil {
+			t.Error(err)
+		}
+		got := date.Format("2006_01_02")
 		if got != tc.want {
 			t.Errorf("got: %s; want: %s", got, tc.want)
 		}
