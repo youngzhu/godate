@@ -10,8 +10,8 @@ import (
 // 日期转换
 
 var layouts = []string{
-	"YYYY-MM-DD", // 2021-07-26
-	"YYYY-MM-DD", // July 1st, 2021
+	"YYYY-MM-DD",
+	"YYYY-MM-DD",
 }
 
 func ParseString(s string) (Date, error) {
@@ -20,20 +20,40 @@ func ParseString(s string) (Date, error) {
 		month Month
 		day   int
 
-		err error
+		validDate *regexp.Regexp
+		err       error
 	)
 
-	var validDate = regexp.MustCompile(`\d{4}-\d{2}-\d{2}`)
+	// 2021-07-26
+	validDate = regexp.MustCompile(`\d{4}-\d{2}-\d{2}`)
 	if validDate.MatchString(s) {
 		year, month, day, err = parseStr1(s)
-		if err != nil {
-			return Date{}, err
+		if err == nil {
+			return NewDateYMD(year, int(month), day)
 		}
 	}
 
-	return NewDateYMD(year, int(month), day)
+	// July 1st, 2021
+	validDate = regexp.MustCompile(`[a-zA-Z]+ \d{1,2}[st|nd|rd|th], \d{4}`)
+	if validDate.MatchString(s) {
+		year, month, day, err = parseStr2(s)
+		if err == nil {
+			return NewDateYMD(year, int(month), day)
+		}
+	}
+
+	return Date{}, fmt.Errorf("unrecognizable date: %s", s)
 }
 
+// layout: July 1st, 2021
+func parseStr2(s string) (year int, month Month, day int, err error) {
+	values := strings.Split(s, "-")
+	fmt.Println(values)
+
+	return year, month, day, nil
+}
+
+// layout: 2021-07-26
 func parseStr1(s string) (year int, month Month, day int, err error) {
 	values := strings.Split(s, "-")
 	//fmt.Println(values)
