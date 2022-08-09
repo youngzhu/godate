@@ -9,10 +9,7 @@ import (
 
 // 日期转换
 
-var layouts = []string{
-	"YYYY-MM-DD",
-	"YYYY-MM-DD",
-}
+const defaultFormat = layoutDate0
 
 func ParseString(s string) (Date, error) {
 	var (
@@ -79,6 +76,13 @@ func parseStr1(s string) (year int, month Month, day int, err error) {
 }
 
 func Parse(v interface{}) (Date, error) {
+
+	switch v.(type) {
+	case string:
+		return ParseString(v.(string))
+	default:
+		return Date{}, fmt.Errorf("unsupported type: %T", v)
+	}
 
 	return NewDate(), nil
 }
