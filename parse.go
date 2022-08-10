@@ -18,7 +18,8 @@ func ParseString(s string) (Date, error) {
 		day   int
 
 		validDate *regexp.Regexp
-		err       error
+
+		err = fmt.Errorf("unrecognizable date: %s", s)
 	)
 
 	// 2021-07-26
@@ -31,7 +32,8 @@ func ParseString(s string) (Date, error) {
 	}
 
 	// July 1st, 2021
-	validDate = regexp.MustCompile(`[a-zA-Z]+ \d{1,2}[st|nd|rd|th], \d{4}`)
+	validDate = regexp.MustCompile(`[A-Z][a-z]+ \d{1,2}(st|nd|rd|th)?, \d{4}`)
+
 	if validDate.MatchString(s) {
 		year, month, day, err = parseStr2(s)
 		if err == nil {
@@ -39,15 +41,67 @@ func ParseString(s string) (Date, error) {
 		}
 	}
 
-	return Date{}, fmt.Errorf("unrecognizable date: %s", s)
+	return Date{}, err
 }
 
 // layout: July 1st, 2021
 func parseStr2(s string) (year int, month Month, day int, err error) {
-	values := strings.Split(s, "-")
-	fmt.Println(values)
+	values := strings.Split(s, " ")
+	//fmt.Println(values)
+
+	month, err = parseMonth(values[0])
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	day, err = parseDay(values[1])
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	y, err := strconv.ParseInt(values[2], 10, 32)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+	year = int(y)
 
 	return year, month, day, nil
+}
+
+func parseDay(s string) (int, error) {
+	d := s
+	if len(s) >= 3 {
+		d = s[0 : len(s)-3]
+	}
+
+	dd, err := strconv.ParseInt(d, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	dayInt := int(dd)
+	if 1 <= dayInt && dayInt <= 31 {
+		return dayInt, nil
+	} else {
+		return 0, fmt.Errorf("invalid day: %s", s)
+	}
+}
+
+func parseMonth(mon string) (Month, error) {
+	if len(mon) == 3 {
+		for i, v := range shortMonthNames {
+			if v == mon {
+				return Month(i + 1), nil
+			}
+		}
+	} else {
+		for i, v := range longMonthNames {
+			if v == mon {
+				return Month(i + 1), nil
+			}
+		}
+	}
+
+	return 0, fmt.Errorf("invalid month: %s", mon)
 }
 
 // layout: 2021-07-26
