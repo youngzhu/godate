@@ -34,18 +34,29 @@ func ParseString(s string) (Date, error) {
 		err = fmt.Errorf("unrecognizable date: %s", s)
 	)
 
-	// 20210726
-	if len(s) == 8 {
-		year, month, day, err = parseStr3(s)
-		if err == nil {
-			return NewDateYMD(year, int(month), day)
-		}
-	}
+	ymd := s
 
-	// 2021-07-26
-	validDate = regexp.MustCompile(`\d{4}-\d{2}-\d{2}`)
-	if validDate.MatchString(s) {
-		year, month, day, err = parseStr1(s)
+	switch len(s) {
+	case 8:
+		// 20210726
+		ymd = s
+		fallthrough
+	case 10:
+		if strings.ContainsRune(s, '-') {
+			// 2021-07-26
+			ymd = strings.ReplaceAll(s, "-", "")
+		} else if strings.ContainsRune(s, '/') {
+			if strings.Index(s, `/`) == 4 {
+				// 2021/07/26
+				ymd = strings.ReplaceAll(s, `/`, "")
+			} else {
+				// 07/26/2021
+				arr := strings.Split(s, `/`)
+				ymd = arr[2] + arr[0] + arr[1]
+			}
+		}
+
+		year, month, day, err = parseYMD(ymd)
 		if err == nil {
 			return NewDateYMD(year, int(month), day)
 		}
@@ -54,7 +65,7 @@ func ParseString(s string) (Date, error) {
 	// July 1st, 2021
 	validDate = regexp.MustCompile(`[A-Z][a-z]+ \d{1,2}(st|nd|rd|th)?, \d{4}`)
 	if validDate.MatchString(s) {
-		year, month, day, err = parseStr2(s)
+		year, month, day, err = parseLongDate(s)
 		if err == nil {
 			return NewDateYMD(year, int(month), day)
 		}
@@ -64,7 +75,7 @@ func ParseString(s string) (Date, error) {
 }
 
 // layout: 20210726
-func parseStr3(s string) (year int, month Month, day int, err error) {
+func parseYMD(s string) (year int, month Month, day int, err error) {
 
 	year, err = parseYear(s[0:4])
 	if err != nil {
@@ -85,7 +96,7 @@ func parseStr3(s string) (year int, month Month, day int, err error) {
 }
 
 // layout: July 1st, 2021
-func parseStr2(s string) (year int, month Month, day int, err error) {
+func parseLongDate(s string) (year int, month Month, day int, err error) {
 	values := strings.Split(s, " ")
 	//fmt.Println(values)
 
@@ -161,29 +172,4 @@ func parseMonth(mon string) (Month, error) {
 	}
 
 	return 0, fmt.Errorf("invalid month: %s", mon)
-}
-
-// layout: 2021-07-26
-func parseStr1(s string) (year int, month Month, day int, err error) {
-	values := strings.Split(s, "-")
-	//fmt.Println(values)
-	y, err := strconv.ParseInt(values[0], 10, 32)
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("invalid year: %s", values[0])
-	}
-	year = int(y)
-
-	m, err := strconv.ParseInt(values[1], 10, 32)
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("invalid month: %s", values[1])
-	}
-	month = Month(m)
-
-	d, err := strconv.ParseInt(values[2], 10, 32)
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("invalid year: %s", values[2])
-	}
-	day = int(d)
-
-	return year, month, day, nil
 }
