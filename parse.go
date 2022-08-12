@@ -11,6 +11,18 @@ import (
 
 const defaultFormat = layoutDate0
 
+func Parse(v interface{}) (Date, error) {
+
+	switch v.(type) {
+	case string:
+		return ParseString(v.(string))
+	default:
+		return Date{}, fmt.Errorf("unsupported type: %T", v)
+	}
+
+	return NewDate(), nil
+}
+
 func ParseString(s string) (Date, error) {
 	var (
 		year  int
@@ -21,6 +33,14 @@ func ParseString(s string) (Date, error) {
 
 		err = fmt.Errorf("unrecognizable date: %s", s)
 	)
+
+	// 20210726
+	if len(s) == 8 {
+		year, month, day, err = parseStr3(s)
+		if err == nil {
+			return NewDateYMD(year, int(month), day)
+		}
+	}
 
 	// 2021-07-26
 	validDate = regexp.MustCompile(`\d{4}-\d{2}-\d{2}`)
@@ -33,7 +53,6 @@ func ParseString(s string) (Date, error) {
 
 	// July 1st, 2021
 	validDate = regexp.MustCompile(`[A-Z][a-z]+ \d{1,2}(st|nd|rd|th)?, \d{4}`)
-
 	if validDate.MatchString(s) {
 		year, month, day, err = parseStr2(s)
 		if err == nil {
@@ -42,6 +61,27 @@ func ParseString(s string) (Date, error) {
 	}
 
 	return Date{}, err
+}
+
+// layout: 20210726
+func parseStr3(s string) (year int, month Month, day int, err error) {
+
+	year, err = parseYear(s[0:4])
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	month, err = parseMonth(s[4:6])
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	day, err = parseDay(s[6:8])
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	return year, month, day, nil
 }
 
 // layout: July 1st, 2021
@@ -59,13 +99,20 @@ func parseStr2(s string) (year int, month Month, day int, err error) {
 		return 0, 0, 0, err
 	}
 
-	y, err := strconv.ParseInt(values[2], 10, 32)
+	year, err = parseYear(values[2])
 	if err != nil {
 		return 0, 0, 0, err
 	}
-	year = int(y)
 
 	return year, month, day, nil
+}
+
+func parseYear(s string) (int, error) {
+	y, err := strconv.ParseInt(s, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return int(y), nil
 }
 
 func parseDay(s string) (int, error) {
@@ -94,9 +141,21 @@ func parseMonth(mon string) (Month, error) {
 			}
 		}
 	} else {
-		for i, v := range longMonthNames {
-			if v == mon {
-				return Month(i + 1), nil
+		num := regexp.MustCompile(`\d{1,2}`)
+		if num.MatchString(mon) {
+			m, err := strconv.ParseInt(mon, 10, 32)
+			if err == nil {
+				mm := Month(m)
+				if January <= mm && mm <= December {
+					return mm, nil
+				}
+			}
+
+		} else {
+			for i, v := range longMonthNames {
+				if v == mon {
+					return Month(i + 1), nil
+				}
 			}
 		}
 	}
@@ -127,16 +186,4 @@ func parseStr1(s string) (year int, month Month, day int, err error) {
 	day = int(d)
 
 	return year, month, day, nil
-}
-
-func Parse(v interface{}) (Date, error) {
-
-	switch v.(type) {
-	case string:
-		return ParseString(v.(string))
-	default:
-		return Date{}, fmt.Errorf("unsupported type: %T", v)
-	}
-
-	return NewDate(), nil
 }
