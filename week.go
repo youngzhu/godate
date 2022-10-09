@@ -77,3 +77,19 @@ func (d Date) Workdays() (workdays []Date) {
 	}
 	return
 }
+
+func (d Date) NextWorkday() Date {
+	dayOfWeek := d.Weekday()
+	var dayToAdd int
+	switch dayOfWeek {
+	case Friday:
+		dayToAdd = 3
+	case Saturday:
+		dayToAdd = 2
+	default:
+		dayToAdd = 1
+	}
+
+	next, _ := d.AddDay(dayToAdd)
+	return next
+}
