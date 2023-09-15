@@ -93,3 +93,12 @@ func (d Date) NextWorkday() Date {
 	next, _ := d.AddDay(dayToAdd)
 	return next
 }
+
+func (d Date) IsWorkday() bool {
+	return !d.IsWeekend()
+}
+
+func (d Date) IsWeekend() bool {
+	weekday := d.Weekday()
+	return Saturday == weekday || Sunday == weekday
+}
