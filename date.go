@@ -30,8 +30,23 @@ func NewDateYMD(year, month, day int) (Date, error) {
 	return Date{date}, nil
 }
 
+func MustDate(year, month, day int) Date {
+	date, _ := NewDateYMD(year, month, day)
+	return date
+}
+
 func Today() Date {
 	return today()
+}
+
+func Tomorrow() Date {
+	t, _ := today().AddDay(1)
+	return t
+}
+
+func Yesterday() Date {
+	y, _ := today().SubDay(1)
+	return y
 }
 
 func (d Date) String() string {
@@ -82,4 +97,12 @@ func (d Date) Weekday() Weekday {
 
 func (d Date) IsTheSameDay(dd Date) bool {
 	return d.Year() == dd.Year() && d.Month() == dd.Month() && d.Day() == dd.Day()
+}
+
+func (d Date) Before(x Date) bool {
+	return d.Time.Before(x.Time)
+}
+
+func (d Date) After(x Date) bool {
+	return d.Time.After(x.Time)
 }
