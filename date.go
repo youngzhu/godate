@@ -12,7 +12,12 @@ type Date struct {
 }
 
 func today() Date {
-	return Date{time.Now()}
+	now := time.Now()
+	// Truncate it to the beginning of the day (midnight)
+	d := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	return Date{d}
+
+	//return Date{time.Now()}
 }
 
 func NewDate() Date {

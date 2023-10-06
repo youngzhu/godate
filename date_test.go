@@ -1,6 +1,7 @@
 package godate
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -67,6 +68,7 @@ var beforeAfter = []struct {
 	{Today(), Yesterday(), false, true},
 	{MustDate(2023, 1, 1), MustDate(2023, 1, 2), true, false},
 	{MustDate(2023, 1, 1), MustDate(2022, 12, 31), false, true},
+	{MustDate(2023, 10, 1), MustDate(2023, 10, 1), false, false},
 	{
 		d1:     Date{time.Date(2023, time.September, 26, 20, 59, 59, 0, time.UTC)},
 		d2:     Date{time.Date(2023, time.September, 26, 20, 59, 59, 0, time.UTC)},
@@ -99,6 +101,15 @@ func TestDate_Before(t *testing.T) {
 	}
 }
 
+func TestDate_Before2(t *testing.T) {
+	d1 := today()
+	time.Sleep(time.Second)
+	d2 := today()
+	if d1.Before(d2) {
+		t.Errorf("%v(%s) is NOT before %v(%s)", d1, d1.Time, d2, d2.Time)
+	}
+}
+
 func TestDate_After(t *testing.T) {
 	for _, testcase := range beforeAfter {
 		t.Run("", func(t *testing.T) {
@@ -109,4 +120,38 @@ func TestDate_After(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestDate_After2(t *testing.T) {
+	d1 := today()
+	time.Sleep(time.Second)
+	d2 := today()
+	if d2.After(d1) {
+		t.Errorf("%v(%s) is NOT after %v(%s)", d2, d2.Time, d1, d1.Time)
+	}
+}
+
+func TestTruncate(t *testing.T) {
+	now := time.Now()
+	trunc := now.Truncate(24 * time.Hour)
+
+	fmt.Println("now:", now)
+	fmt.Println("trunc:", trunc)
+}
+
+func TestRound(t *testing.T) {
+	now := time.Now()
+	round := now.Round(24 * time.Hour)
+
+	fmt.Println("now:", now)
+	fmt.Println("round:", round)
+}
+
+func TestTruncate2(t *testing.T) {
+	now := time.Now()
+	// Truncate it to the beginning of the day (midnight)
+	trunc := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+
+	fmt.Println("now:", now)
+	fmt.Println("trunc:", trunc)
 }
