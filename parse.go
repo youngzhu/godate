@@ -22,20 +22,32 @@ func Parse(v interface{}) (Date, error) {
 
 func parseString(s string) (Date, error) {
 	var exp *regexp.Regexp
+	var matches []string
 
 	if strings.ContainsRune(s, '-') {
 		//yyyy-mm-dd
 		exp = regexp.MustCompile(`^(\d{4})-(\d{1,2})-(\d{1,2})$`)
-		matches := exp.FindStringSubmatch(s)
+		matches = exp.FindStringSubmatch(s)
 		if matches != nil {
 			return parseYMDSlice(matches[1:])
 		}
 	} else if strings.ContainsRune(s, '/') {
 		// yyyy/mm/dd
 		exp = regexp.MustCompile(`^(\d{4})/(\d{1,2})/(\d{1,2})$`)
-		matches := exp.FindStringSubmatch(s)
+		matches = exp.FindStringSubmatch(s)
 		if matches != nil {
 			return parseYMDSlice(matches[1:])
+		} else {
+			// mm/dd/yyyy
+			exp = regexp.MustCompile(`^(\d{1,2})/(\d{1,2})/(\d{4})$`)
+			matches = exp.FindStringSubmatch(s)
+			if matches != nil {
+				ymd := make([]string, 3)
+				ymd[0] = matches[3]
+				ymd[1] = matches[1]
+				ymd[2] = matches[2]
+				return parseYMDSlice(ymd)
+			}
 		}
 	}
 
