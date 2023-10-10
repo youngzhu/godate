@@ -23,29 +23,46 @@ func Parse(v interface{}) (Date, error) {
 func parseString(s string) (Date, error) {
 	var exp *regexp.Regexp
 
-	//yyyy-mm-dd
 	if strings.ContainsRune(s, '-') {
+		//yyyy-mm-dd
 		exp = regexp.MustCompile(`^(\d{4})-(\d{1,2})-(\d{1,2})$`)
 		matches := exp.FindStringSubmatch(s)
 		if matches != nil {
-			year, err := parseYear(matches[1])
-			if err != nil {
-				goto fail
-			}
-			month, err := parseMonth(matches[2])
-			if err != nil {
-				goto fail
-			}
-			day, err := parseDay(matches[3])
-			if err != nil {
-				goto fail
-			}
-			return MustDate(year, month.IntValue(), day), nil
+			return parseYMDSlice(matches[1:])
+		}
+	} else if strings.ContainsRune(s, '/') {
+		// yyyy/mm/dd
+		exp = regexp.MustCompile(`^(\d{4})/(\d{1,2})/(\d{1,2})$`)
+		matches := exp.FindStringSubmatch(s)
+		if matches != nil {
+			return parseYMDSlice(matches[1:])
 		}
 	}
 
-fail:
 	return Date{}, fmt.Errorf("unrecognizable date: %s", s)
+}
+
+func parseYMDSlice(ymd []string) (date Date, err error) {
+	var year, day int
+	var month Month
+
+	year, err = parseYear(ymd[0])
+	if err != nil {
+		goto fail
+	}
+	month, err = parseMonth(ymd[1])
+	if err != nil {
+		goto fail
+	}
+	day, err = parseDay(ymd[2])
+	if err != nil {
+		goto fail
+	}
+
+	date = MustDate(year, month.IntValue(), day)
+
+fail:
+	return
 }
 
 func parseString0(s string) (Date, error) {
