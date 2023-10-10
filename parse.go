@@ -12,18 +12,43 @@ import (
 const defaultFormat = layoutDate0
 
 func Parse(v interface{}) (Date, error) {
-
 	switch v.(type) {
 	case string:
-		return ParseString(v.(string))
+		return parseString(v.(string))
 	default:
 		return Date{}, fmt.Errorf("unsupported type: %T", v)
 	}
-
-	return NewDate(), nil
 }
 
-func ParseString(s string) (Date, error) {
+func parseString(s string) (Date, error) {
+	var exp *regexp.Regexp
+
+	//yyyy-mm-dd
+	if strings.ContainsRune(s, '-') {
+		exp = regexp.MustCompile(`^(\d{4})-(\d{1,2})-(\d{1,2})$`)
+		matches := exp.FindStringSubmatch(s)
+		if matches != nil {
+			year, err := parseYear(matches[1])
+			if err != nil {
+				goto fail
+			}
+			month, err := parseMonth(matches[2])
+			if err != nil {
+				goto fail
+			}
+			day, err := parseDay(matches[3])
+			if err != nil {
+				goto fail
+			}
+			return MustDate(year, month.IntValue(), day), nil
+		}
+	}
+
+fail:
+	return Date{}, fmt.Errorf("unrecognizable date: %s", s)
+}
+
+func parseString0(s string) (Date, error) {
 	var (
 		year  int
 		month Month
