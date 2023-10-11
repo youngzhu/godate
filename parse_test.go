@@ -1,6 +1,7 @@
 package godate
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"testing"
@@ -44,24 +45,26 @@ func TestParse(t *testing.T) {
 	}
 }
 
-// todo
-//func TestParse_error(t *testing.T) {
-//	testcases := []struct {
-//		input interface{}
-//		err   error
-//	}{
-//		{"2023-19-1", nil},
-//	}
-//	for i, tc := range testcases {
-//		name := fmt.Sprintf("No.%d", i+1)
-//		t.Run(name, func(t *testing.T) {
-//			_, err := Parse(tc.input)
-//			if !errors.Is(err, tc.err) {
-//				t.Errorf("parse error, want: %v, but got: %v\n", tc.err, err)
-//			}
-//		})
-//	}
-//}
+func TestParse_error(t *testing.T) {
+	testcases := []struct {
+		input interface{}
+		err   error
+	}{
+		{1.0, ErrIllegalArgument},
+		{"2023-19-1", ErrInvalidMonth},
+		{"2023-1-32", ErrInvalidDay},
+		{"20231.3", ErrUnrecognizable},
+	}
+	for i, tc := range testcases {
+		name := fmt.Sprintf("No.%d", i+1)
+		t.Run(name, func(t *testing.T) {
+			_, err := Parse(tc.input)
+			if !errors.Is(err, tc.err) {
+				t.Errorf("Expected error %q, got %q instead", tc.err, err)
+			}
+		})
+	}
+}
 
 //
 // test others

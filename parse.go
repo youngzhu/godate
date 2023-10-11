@@ -1,6 +1,7 @@
 package godate
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -9,12 +10,40 @@ import (
 
 // 日期转换
 
+var (
+	ErrIllegalArgument = errors.New("illegal argument")
+	ErrInvalidMonth    = errors.New("invalid month value")
+	ErrInvalidDay      = errors.New("invalid day value")
+	ErrUnrecognizable  = errors.New("unrecognizable date")
+)
+
+type parseError struct {
+	cause   error  // the underlying error
+	message string // describes the error
+}
+
+func (p *parseError) Error() string {
+	return fmt.Sprintf("parse error, %s: %s", p.cause, p.message)
+}
+
+func (p *parseError) Unwrap() error {
+	return p.cause
+}
+
+func newParseError(cause error, message string) *parseError {
+	return &parseError{
+		cause:   cause,
+		message: message,
+	}
+}
+
 func Parse(v interface{}) (Date, error) {
 	switch v.(type) {
 	case string:
 		return parseString(v.(string))
 	default:
-		return Date{}, fmt.Errorf("unsupported type: %T", v)
+		errMsg := fmt.Sprintf("unsupported type: %T", v)
+		return Date{}, newParseError(ErrIllegalArgument, errMsg)
 	}
 }
 
@@ -77,7 +106,7 @@ func parseString(s string) (Date, error) {
 		return parseYMDSlice([]string{year, month, day})
 	}
 
-	return Date{}, fmt.Errorf("unrecognizable date: %s", s)
+	return Date{}, newParseError(ErrUnrecognizable, s)
 }
 
 func parseYMDSlice(ymd []string) (date Date, err error) {
@@ -125,7 +154,7 @@ func parseDay(s string) (int, error) {
 	if 1 <= dayInt && dayInt <= 31 {
 		return dayInt, nil
 	} else {
-		return 0, fmt.Errorf("invalid day: %s", s)
+		return 0, newParseError(ErrInvalidDay, s)
 	}
 }
 
@@ -156,5 +185,5 @@ func parseMonth(mon string) (Month, error) {
 		}
 	}
 
-	return 0, fmt.Errorf("invalid month: %s", mon)
+	return 0, newParseError(ErrInvalidMonth, mon)
 }
