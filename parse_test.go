@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+	"time"
 )
 
-func TestParse(t *testing.T) {
+func TestParse_string(t *testing.T) {
 	testcases := []struct {
 		input interface{}
 		date  Date
@@ -28,6 +29,30 @@ func TestParse(t *testing.T) {
 		{"July 1st, 2021", MustDate(2021, 7, 1)},
 		{"July 1, 2021", MustDate(2021, 7, 1)},
 		{"July 11, 2021", MustDate(2021, 7, 11)},
+	}
+	for i, tc := range testcases {
+		name := fmt.Sprintf("No.%d", i+1)
+		t.Run(name, func(t *testing.T) {
+			date, err := Parse(tc.input)
+			if err != nil {
+				t.Errorf("got error: %v\n", err)
+			}
+			if err == nil {
+				if !date.IsTheSameDay(tc.date) {
+					t.Errorf("want: %v, but got: %v\n", tc.date, date)
+				}
+			}
+		})
+	}
+}
+
+func TestParse_time(t *testing.T) {
+	testcases := []struct {
+		input interface{}
+		date  Date
+	}{
+		{time.Now(), today()},
+		{time.Date(2023, 10, 1, 0, 0, 0, 0, time.Local), MustDate(2023, 10, 1)},
 	}
 	for i, tc := range testcases {
 		name := fmt.Sprintf("No.%d", i+1)

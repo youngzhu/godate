@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // 日期转换
@@ -41,6 +42,9 @@ func Parse(v interface{}) (Date, error) {
 	switch v.(type) {
 	case string:
 		return parseString(v.(string))
+	case time.Time:
+		t := v.(time.Time)
+		return MustDate(t.Year(), int(t.Month()), t.Day()), nil
 	default:
 		errMsg := fmt.Sprintf("unsupported type: %T", v)
 		return Date{}, newParseError(ErrIllegalArgument, errMsg)
