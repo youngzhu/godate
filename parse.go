@@ -49,6 +49,13 @@ func parseString(s string) (Date, error) {
 				return parseYMDSlice(ymd)
 			}
 		}
+	} else if strings.ContainsRune(s, '.') {
+		//yyyy.mm.dd
+		exp = regexp.MustCompile(`^(\d{4}).(\d{1,2}).(\d{1,2})$`)
+		matches = exp.FindStringSubmatch(s)
+		if matches != nil {
+			return parseYMDSlice(matches[1:])
+		}
 	}
 
 	return Date{}, fmt.Errorf("unrecognizable date: %s", s)
