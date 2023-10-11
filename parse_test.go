@@ -6,30 +6,6 @@ import (
 	"testing"
 )
 
-var parseStringTestCases = []struct {
-	input string
-	want  string
-}{
-	{"20210726", "2021_07_26"},
-	{"2021-07-26", "2021_07_26"},
-	{"2021/07/26", "2021_07_26"},
-	{"07/26/2021", "2021_07_26"},
-	{"July 1st, 2021", "2021_07_01"},
-}
-
-func TestParseString(t *testing.T) {
-	for _, tc := range parseStringTestCases {
-		date, err := parseString0(tc.input)
-		if err != nil {
-			t.Error(err)
-		}
-		got := date.Format("2006_01_02")
-		if got != tc.want {
-			t.Errorf("got: %s; want: %s", got, tc.want)
-		}
-	}
-}
-
 func TestParse(t *testing.T) {
 	testcases := []struct {
 		input interface{}
@@ -48,6 +24,9 @@ func TestParse(t *testing.T) {
 		{"20230901", MustDate(2023, 9, 1)},
 		{"20230931", MustDate(2023, 9, 31)},
 		{"20240101", MustDate(2024, 1, 1)},
+		{"July 1st, 2021", MustDate(2021, 7, 1)},
+		{"July 1, 2021", MustDate(2021, 7, 1)},
+		{"July 11, 2021", MustDate(2021, 7, 11)},
 	}
 	for i, tc := range testcases {
 		name := fmt.Sprintf("No.%d", i+1)

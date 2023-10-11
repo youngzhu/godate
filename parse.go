@@ -9,8 +9,6 @@ import (
 
 // 日期转换
 
-const defaultFormat = layoutDate0
-
 func Parse(v interface{}) (Date, error) {
 	switch v.(type) {
 	case string:
@@ -65,6 +63,20 @@ func parseString(s string) (Date, error) {
 		}
 	}
 
+	// July 1st, 2021
+	exp = regexp.MustCompile(`^([A-Z][a-z]+) (\d{1,2})(st|nd|rd|th)?, (\d{4})$`)
+	matches = exp.FindStringSubmatch(s)
+	if matches != nil {
+		var year, month, day string
+		if len(matches) == 4 {
+			year, month, day = matches[3], matches[1], matches[2]
+		} else {
+			year, month, day = matches[4], matches[1], matches[2]
+		}
+
+		return parseYMDSlice([]string{year, month, day})
+	}
+
 	return Date{}, fmt.Errorf("unrecognizable date: %s", s)
 }
 
@@ -89,101 +101,6 @@ func parseYMDSlice(ymd []string) (date Date, err error) {
 
 fail:
 	return
-}
-
-func parseString0(s string) (Date, error) {
-	var (
-		year  int
-		month Month
-		day   int
-
-		validDate *regexp.Regexp
-
-		err = fmt.Errorf("unrecognizable date: %s", s)
-	)
-
-	ymd := s
-
-	switch len(s) {
-	case 8:
-		// 20210726
-		ymd = s
-		fallthrough
-	case 10:
-		if strings.ContainsRune(s, '-') {
-			// 2021-07-26
-			ymd = strings.ReplaceAll(s, "-", "")
-		} else if strings.ContainsRune(s, '/') {
-			if strings.Index(s, `/`) == 4 {
-				// 2021/07/26
-				ymd = strings.ReplaceAll(s, `/`, "")
-			} else {
-				// 07/26/2021
-				arr := strings.Split(s, `/`)
-				ymd = arr[2] + arr[0] + arr[1]
-			}
-		}
-
-		year, month, day, err = parseYMD(ymd)
-		if err == nil {
-			return NewDateYMD(year, int(month), day)
-		}
-	}
-
-	// July 1st, 2021
-	validDate = regexp.MustCompile(`[A-Z][a-z]+ \d{1,2}(st|nd|rd|th)?, \d{4}`)
-	if validDate.MatchString(s) {
-		year, month, day, err = parseLongDate(s)
-		if err == nil {
-			return NewDateYMD(year, int(month), day)
-		}
-	}
-
-	return Date{}, err
-}
-
-// layout: 20210726
-func parseYMD(s string) (year int, month Month, day int, err error) {
-
-	year, err = parseYear(s[0:4])
-	if err != nil {
-		return 0, 0, 0, err
-	}
-
-	month, err = parseMonth(s[4:6])
-	if err != nil {
-		return 0, 0, 0, err
-	}
-
-	day, err = parseDay(s[6:8])
-	if err != nil {
-		return 0, 0, 0, err
-	}
-
-	return year, month, day, nil
-}
-
-// layout: July 1st, 2021
-func parseLongDate(s string) (year int, month Month, day int, err error) {
-	values := strings.Split(s, " ")
-	//fmt.Println(values)
-
-	month, err = parseMonth(values[0])
-	if err != nil {
-		return 0, 0, 0, err
-	}
-
-	day, err = parseDay(values[1])
-	if err != nil {
-		return 0, 0, 0, err
-	}
-
-	year, err = parseYear(values[2])
-	if err != nil {
-		return 0, 0, 0, err
-	}
-
-	return year, month, day, nil
 }
 
 func parseYear(s string) (int, error) {
