@@ -44,7 +44,10 @@ func TestParse(t *testing.T) {
 		{"2023.10.01", MustDate(2023, 10, 1)},
 		{"2023.10.1", MustDate(2023, 10, 1)},
 		{"2023.9.1", MustDate(2023, 9, 1)},
-		//{"20231001", MustDate(2023, 10, 1), nil},
+		{"20231001", MustDate(2023, 10, 1)},
+		{"20230901", MustDate(2023, 9, 1)},
+		{"20230931", MustDate(2023, 9, 31)},
+		{"20240101", MustDate(2024, 1, 1)},
 	}
 	for i, tc := range testcases {
 		name := fmt.Sprintf("No.%d", i+1)

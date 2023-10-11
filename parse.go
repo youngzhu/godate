@@ -56,6 +56,13 @@ func parseString(s string) (Date, error) {
 		if matches != nil {
 			return parseYMDSlice(matches[1:])
 		}
+	} else if len(s) == 8 {
+		//yyyymmdd
+		exp = regexp.MustCompile(`^(\d{4})(\d{1,2})(\d{1,2})$`)
+		matches = exp.FindStringSubmatch(s)
+		if matches != nil {
+			return parseYMDSlice(matches[1:])
+		}
 	}
 
 	return Date{}, fmt.Errorf("unrecognizable date: %s", s)
