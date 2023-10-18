@@ -67,6 +67,10 @@ func (d Date) StringCN() string {
 	return gc.Date(d.Time)
 }
 
+func (d Date) FullStringCN() string {
+	return gc.Date(d.Time) + "，" + gc.Weekday(d.Time)
+}
+
 func (d Date) Month() Month {
 	return Month(d.Time.Month())
 }
