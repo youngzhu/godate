@@ -2,10 +2,15 @@ package godate
 
 import (
 	"fmt"
+	gc "github.com/youngzhu/go2chinese"
 	"time"
 )
 
-const layoutDate0 = "2006-01-02"
+const (
+	layoutDate0 = "2006-01-02"
+
+	Day = 24 * time.Hour
+)
 
 type Date struct {
 	time.Time
@@ -58,13 +63,13 @@ func (d Date) String() string {
 	return d.Format(layoutDate0)
 }
 
+func (d Date) StringCN() string {
+	return gc.Date(d.Time)
+}
+
 func (d Date) Month() Month {
 	return Month(d.Time.Month())
 }
-
-const (
-	Day = time.Hour * 24
-)
 
 // AddDay returns the date d+days.
 func (d Date) AddDay(days int) (Date, error) {
