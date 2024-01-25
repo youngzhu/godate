@@ -120,3 +120,8 @@ func (d Date) Before(x Date) bool {
 func (d Date) After(x Date) bool {
 	return d.Time.After(x.Time)
 }
+
+func (d Date) IsChineseHoliday() bool {
+
+	return false
+}
