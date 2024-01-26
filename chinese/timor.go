@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// 通过 https://timor.tech/api/holiday/ 获取数据
+// 通过 https://timor.tech/api/holiday/{year} 获取数据
 
 type timorResult struct {
 	Code     int `json:"code"`
