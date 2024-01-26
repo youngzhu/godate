@@ -121,7 +121,28 @@ func (d Date) After(x Date) bool {
 	return d.Time.After(x.Time)
 }
 
-func (d Date) IsChineseHoliday() bool {
+/*
+形成引用环了。这个判断逻辑都放到chinese包里吧
 
-	return false
+// IsOffDayInChina 在中国是否放假日
+// 放假应满足（满足其一即可）：
+// 1. 周末 且 没有调班
+// 2. 中国节假日
+//
+// 上班应满足（满足其一即可）：
+// 1. 工作日（周一至周五） 且 不是中国节假日
+// 2. 调班
+func (d Date) IsOffDayInChina() bool {
+	if chinese.IsHoliday(d) {
+		return true
+	}
+
+	return d.IsWeekend() && !chinese.IsExtWorkday(d)
 }
+
+// IsWorkDayInChina 在中国是否上班日
+func (d Date) IsWorkDayInChina() bool {
+
+	return !d.IsOffDayInChina()
+}
+*/

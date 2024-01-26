@@ -155,23 +155,3 @@ func TestTruncate2(t *testing.T) {
 	fmt.Println("now:", now)
 	fmt.Println("trunc:", trunc)
 }
-
-func TestDate_IsChineseHoliday(t *testing.T) {
-	testCases := []struct {
-		date Date
-		want bool
-	}{
-		{MustDate(2024, 1, 1), true},
-		{MustDate(2024, 1, 24), false},
-	}
-
-	for _, testcase := range testCases {
-		t.Run("", func(t *testing.T) {
-			got := testcase.date.IsChineseHoliday()
-			if got != testcase.want {
-				t.Errorf("%v is Chinese holiday? want: %v, but got: %v",
-					testcase.date, testcase.want, got)
-			}
-		})
-	}
-}

@@ -25,7 +25,7 @@ type timorResult struct {
 
 type timorFetcher struct{}
 
-func (f timorFetcher) Fetch(year string) (chinese.Holidays, chinese.Workdays, error) {
+func (f timorFetcher) Fetch(year string) (chinese.Holidays, chinese.ExtWorkdays, error) {
 	// 先从本地获取
 	holidays, workdays, err := readFromLocal(year)
 	if err == nil {
@@ -39,7 +39,7 @@ func (f timorFetcher) Fetch(year string) (chinese.Holidays, chinese.Workdays, er
 
 const rootPath = "data/timor"
 
-func readFromLocal(year string) (chinese.Holidays, chinese.Workdays, error) {
+func readFromLocal(year string) (chinese.Holidays, chinese.ExtWorkdays, error) {
 	// Open the file.
 	file, err := os.Open(filepath.Join(rootPath, year+".json"))
 	if err != nil {
@@ -59,7 +59,7 @@ func readFromLocal(year string) (chinese.Holidays, chinese.Workdays, error) {
 	}
 
 	holidays := make(chinese.Holidays, 0, len(result.Holidays))
-	workdays := make(chinese.Workdays, 0, len(result.Holidays))
+	workdays := make(chinese.ExtWorkdays, 0, len(result.Holidays))
 
 	for _, day := range result.Holidays {
 		date, err := godate.Parse(day.Date)
