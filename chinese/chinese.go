@@ -88,7 +88,7 @@ func IsHoliday(date godate.Date) bool {
 	return cd.holidays[date.Year()].test(date)
 }
 
-// IsExtWorkday 是否中国式调班日
+// IsExtWorkday 是否中国式调班日（额外工作日）
 func IsExtWorkday(date godate.Date) bool {
 	return cd.extWorkdays[date.Year()].test(date)
 }
