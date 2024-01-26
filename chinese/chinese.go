@@ -9,15 +9,21 @@ import (
 // 中国特色的调休制度
 // TODO 从官方网站查询中国节假日和调休信息
 
-type (
-	Holidays    []godate.Date // 中国节假日
-	ExtWorkdays []godate.Date // 中国式调休日
-)
+type cnDateSlice []godate.Date
+
+func (c cnDateSlice) test(date godate.Date) bool {
+	for _, d := range c {
+		if d.IsTheSameDay(date) {
+			return true
+		}
+	}
+	return false
+}
 
 type chineseDate struct {
 	// key: year
-	holidays    map[int]Holidays
-	extWorkdays map[int]ExtWorkdays
+	holidays    map[int]cnDateSlice
+	extWorkdays map[int]cnDateSlice
 }
 
 var cd *chineseDate
@@ -25,14 +31,18 @@ var cd *chineseDate
 func newChineseDate() *chineseDate {
 	bc := new(chineseDate)
 
-	bc.holidays = make(map[int]Holidays)
-	bc.extWorkdays = make(map[int]ExtWorkdays)
+	bc.holidays = make(map[int]cnDateSlice)
+	bc.extWorkdays = make(map[int]cnDateSlice)
 
 	return bc
 }
 
 func init() {
 	cd = newChineseDate()
+
+	fetcher = timorFetcher{}
+
+	GetHolidays(godate.Today().Year())
 }
 
 func GetHolidays(year int) []godate.Date {
@@ -75,24 +85,12 @@ func GetExtWorkdays(year int) []godate.Date {
 
 // IsHoliday 是否中国节假日
 func IsHoliday(date godate.Date) bool {
-	for _, d := range GetHolidays(date.Year()) {
-		if d.IsTheSameDay(date) {
-			return true
-		}
-	}
-
-	return false
+	return cd.holidays[date.Year()].test(date)
 }
 
 // IsExtWorkday 是否中国式调班日
 func IsExtWorkday(date godate.Date) bool {
-	for _, d := range GetExtWorkdays(date.Year()) {
-		if d.IsTheSameDay(date) {
-			return true
-		}
-	}
-
-	return false
+	return cd.extWorkdays[date.Year()].test(date)
 }
 
 // IsOffDayInChina 在中国是否放假日
