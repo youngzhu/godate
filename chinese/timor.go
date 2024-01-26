@@ -2,6 +2,7 @@ package chinese
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/youngzhu/godate"
 	"os"
 	"path/filepath"
@@ -33,7 +34,7 @@ func (f timorFetcher) Fetch(year string) (cnDateSlice, cnDateSlice, error) {
 
 	// 通过API获取
 
-	return nil, nil, nil
+	return nil, nil, fmt.Errorf("暂未实现")
 }
 
 const rootPath = "data/timor"

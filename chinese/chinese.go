@@ -45,40 +45,35 @@ func init() {
 	GetHolidays(godate.Today().Year())
 }
 
-func GetHolidays(year int) []godate.Date {
-	if holidays, ok := cd.holidays[year]; ok {
+// 校验是否有数据
+// 如果没有，则获取并填充
+func (c *chineseDate) check(year int) {
+	if _, ok := cd.holidays[year]; ok {
 		log.Println("cached:", year)
-		return holidays
+		return
 	}
 
 	yearStr := strconv.Itoa(year)
-	log.Println("search for year", yearStr)
+	log.Println("fetch for year:", yearStr)
 	holidays, extWorkdays, err := fetchData(yearStr)
 	if err != nil {
-		return nil
+		log.Fatal(err) // 不会再往下执行了
 	}
+
+	log.Println("fetch DONE for year:", yearStr)
 
 	cd.holidays[year] = holidays
 	cd.extWorkdays[year] = extWorkdays
+}
+
+func GetHolidays(year int) []godate.Date {
+	cd.check(year)
 
 	return cd.holidays[year]
 }
 
 func GetExtWorkdays(year int) []godate.Date {
-	if extWorkdays, ok := cd.extWorkdays[year]; ok {
-		log.Println("cached data:", year)
-		return extWorkdays
-	}
-
-	yearStr := strconv.Itoa(year)
-	log.Println("search for year", yearStr)
-	holidays, extWorkdays, err := fetchData(yearStr)
-	if err != nil {
-		return nil
-	}
-
-	cd.holidays[year] = holidays
-	cd.extWorkdays[year] = extWorkdays
+	cd.check(year)
 
 	return cd.extWorkdays[year]
 }

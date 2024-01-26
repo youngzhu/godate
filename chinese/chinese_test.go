@@ -57,3 +57,7 @@ func TestIsWorkDayInChina(t *testing.T) {
 		})
 	}
 }
+
+func TestTimorFetcher_Fetch_fail(t *testing.T) {
+	GetHolidays(2023)
+}
