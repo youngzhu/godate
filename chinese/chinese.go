@@ -2,7 +2,6 @@ package chinese
 
 import (
 	"github.com/youngzhu/godate"
-	"github.com/youngzhu/godate/fetch"
 	"log"
 	"strconv"
 )
@@ -17,7 +16,8 @@ type (
 
 type chineseDate struct {
 	// key: year
-	holidays map[int][]godate.Date
+	holidays    map[int]Holidays
+	extWorkdays map[int]ExtWorkdays
 }
 
 var cd *chineseDate
@@ -25,12 +25,11 @@ var cd *chineseDate
 func newChineseDate() *chineseDate {
 	bc := new(chineseDate)
 
-	bc.holidays = make(map[int][]godate.Date)
+	bc.holidays = make(map[int]Holidays)
+	bc.extWorkdays = make(map[int]ExtWorkdays)
 
 	return bc
 }
-
-var fetcher fetch.Fetcher
 
 func init() {
 	cd = newChineseDate()
@@ -44,14 +43,38 @@ func GetHolidays(year int) []godate.Date {
 
 	yearStr := strconv.Itoa(year)
 	log.Println("search for year", yearStr)
-	fetch.Run(yearStr)
+	holidays, extWorkdays, err := fetchData(yearStr)
+	if err != nil {
+		return nil
+	}
 
-	return nil
+	cd.holidays[year] = holidays
+	cd.extWorkdays[year] = extWorkdays
+
+	return cd.holidays[year]
+}
+
+func GetExtWorkdays(year int) []godate.Date {
+	if holidays, ok := cd.holidays[year]; ok {
+		log.Println("cached data:", year)
+		return holidays
+	}
+
+	yearStr := strconv.Itoa(year)
+	log.Println("search for year", yearStr)
+	holidays, extWorkdays, err := fetchData(yearStr)
+	if err != nil {
+		return nil
+	}
+
+	cd.holidays[year] = holidays
+	cd.extWorkdays[year] = extWorkdays
+
+	return cd.extWorkdays[year]
 }
 
 // IsHoliday 是否中国节假日
 func IsHoliday(date godate.Date) bool {
-
 	for _, d := range GetHolidays(date.Year()) {
 		if d.IsTheSameDay(date) {
 			return true
@@ -63,6 +86,11 @@ func IsHoliday(date godate.Date) bool {
 
 // IsExtWorkday 是否中国式调班日
 func IsExtWorkday(date godate.Date) bool {
+	for _, d := range GetExtWorkdays(date.Year()) {
+		if d.IsTheSameDay(date) {
+			return true
+		}
+	}
 
 	return false
 }

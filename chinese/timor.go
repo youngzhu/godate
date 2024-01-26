@@ -1,9 +1,8 @@
-package fetch
+package chinese
 
 import (
 	"encoding/json"
 	"github.com/youngzhu/godate"
-	"github.com/youngzhu/godate/chinese"
 	"os"
 	"path/filepath"
 )
@@ -25,7 +24,7 @@ type timorResult struct {
 
 type timorFetcher struct{}
 
-func (f timorFetcher) Fetch(year string) (chinese.Holidays, chinese.ExtWorkdays, error) {
+func (f timorFetcher) Fetch(year string) (Holidays, ExtWorkdays, error) {
 	// 先从本地获取
 	holidays, workdays, err := readFromLocal(year)
 	if err == nil {
@@ -39,7 +38,7 @@ func (f timorFetcher) Fetch(year string) (chinese.Holidays, chinese.ExtWorkdays,
 
 const rootPath = "data/timor"
 
-func readFromLocal(year string) (chinese.Holidays, chinese.ExtWorkdays, error) {
+func readFromLocal(year string) (Holidays, ExtWorkdays, error) {
 	// Open the file.
 	file, err := os.Open(filepath.Join(rootPath, year+".json"))
 	if err != nil {
@@ -58,8 +57,8 @@ func readFromLocal(year string) (chinese.Holidays, chinese.ExtWorkdays, error) {
 		return nil, nil, err
 	}
 
-	holidays := make(chinese.Holidays, 0, len(result.Holidays))
-	workdays := make(chinese.ExtWorkdays, 0, len(result.Holidays))
+	holidays := make(Holidays, 0, len(result.Holidays))
+	workdays := make(ExtWorkdays, 0, len(result.Holidays))
 
 	for _, day := range result.Holidays {
 		date, err := godate.Parse(day.Date)
