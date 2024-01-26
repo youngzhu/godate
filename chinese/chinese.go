@@ -55,9 +55,9 @@ func GetHolidays(year int) []godate.Date {
 }
 
 func GetExtWorkdays(year int) []godate.Date {
-	if holidays, ok := cd.holidays[year]; ok {
+	if extWorkdays, ok := cd.extWorkdays[year]; ok {
 		log.Println("cached data:", year)
-		return holidays
+		return extWorkdays
 	}
 
 	yearStr := strconv.Itoa(year)

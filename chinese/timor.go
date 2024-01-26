@@ -58,7 +58,7 @@ func readFromLocal(year string) (Holidays, ExtWorkdays, error) {
 	}
 
 	holidays := make(Holidays, 0, len(result.Holidays))
-	workdays := make(ExtWorkdays, 0, len(result.Holidays))
+	extWorkdays := make(ExtWorkdays, 0, len(result.Holidays))
 
 	for _, day := range result.Holidays {
 		date, err := godate.Parse(day.Date)
@@ -68,10 +68,10 @@ func readFromLocal(year string) (Holidays, ExtWorkdays, error) {
 		if day.Holiday {
 			holidays = append(holidays, date)
 		} else {
-			workdays = append(workdays, date)
+			extWorkdays = append(extWorkdays, date)
 		}
 	}
 
 	// We don't need to check for errors, the caller can do this.
-	return holidays, workdays, err
+	return holidays, extWorkdays, err
 }
