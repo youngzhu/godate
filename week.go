@@ -2,60 +2,67 @@ package godate
 
 import "fmt"
 
-// A Weekday specifies a day of the week (Sunday = 0, ...).
+// A Weekday representing the 7 days of the week.
+// In addition to the textual name, each day-of-week has an int value.
+// The int value follows the ISO-8601 standard, from 1 (Monday) to 7 (Sunday).
 type Weekday int
 
 const (
-	Sunday Weekday = iota
-	Monday
+	Monday Weekday = 1 + iota
 	Tuesday
 	Wednesday
 	Thursday
 	Friday
 	Saturday
+	Sunday
 )
 
 var longWeekdayNames = []string{
-	"Sunday",
 	"Monday",
 	"Tuesday",
 	"Wednesday",
 	"Thursday",
 	"Friday",
 	"Saturday",
+	"Sunday",
 }
 
 var shortWeekdayNames = []string{
-	"Sun",
 	"Mon",
 	"Tue",
 	"Wed",
 	"Thu",
 	"Fri",
 	"Sat",
+	"Sun",
 }
 
 // String returns the English name of the day ("Sunday", "Monday", ...).
-func (d Weekday) String() string {
-	if Sunday <= d && d <= Saturday {
-		return longWeekdayNames[d]
+func (w Weekday) String() string {
+	if Monday <= w && w <= Sunday {
+		return longWeekdayNames[w]
 	}
-	return fmt.Sprintf("!Weekday(\"%d\")", d)
+	return fmt.Sprintf("!Weekday(\"%d\")", w)
+}
+
+// IntValue returns the day-of-week to represent, from 1 (Monday) to 7 (Sunday)
+func (w Weekday) IntValue() int {
+	return int(w)
 }
 
 func (d Date) Workdays() (workdays []Date) {
 	w := d.Weekday()
 	switch w {
-	case Sunday:
-		for i := Monday; i <= Friday; i++ {
-			day, _ := d.AddDay(int(i))
-			workdays = append(workdays, day)
-		}
-	case Saturday:
-		for i := Friday; i >= Monday; i-- {
+	case Saturday, Sunday:
+		for i, cnt := int(w)-1, 5; i > 0 && cnt > 0; i, cnt = i-1, cnt-1 {
 			day, _ := d.SubDay(int(i))
 			workdays = append(workdays, day)
 		}
+	//case Sunday:
+	//	for i := Monday; i <= Friday; i++ {
+	//		day, _ := d.AddDay(int(i))
+	//		workdays = append(workdays, day)
+	//	}
 	default:
 		workdays = make([]Date, 5)
 

@@ -106,7 +106,12 @@ func (d Date) MonthDay() int {
 
 // Weekday returns the day of the week specified by d.
 func (d Date) Weekday() Weekday {
-	return Weekday(d.Time.Weekday())
+	weekday := int(d.Time.Weekday())
+	if weekday == 0 {
+		return Sunday
+	} else {
+		return Weekday(weekday)
+	}
 }
 
 func (d Date) IsTheSameDay(dd Date) bool {

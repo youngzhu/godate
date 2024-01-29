@@ -12,23 +12,49 @@ func TestWeekday_String(t *testing.T) {
 
 var (
 	oneWeek = []Date{
-		MustDate(2022, 6, 12),
 		MustDate(2022, 6, 13),
 		MustDate(2022, 6, 14),
 		MustDate(2022, 6, 15),
 		MustDate(2022, 6, 16),
 		MustDate(2022, 6, 17),
 		MustDate(2022, 6, 18),
+		MustDate(2022, 6, 19),
 	}
-	workdays = oneWeek[Monday:Saturday]
+
+	workdays = oneWeek[0:5]
 )
 
+func TestDate_Weekday(t *testing.T) {
+	testcases := []struct {
+		date      Date
+		dayOfWeek Weekday
+	}{
+		{oneWeek[0], Monday},
+		{oneWeek[1], Tuesday},
+		{oneWeek[2], Wednesday},
+		{oneWeek[3], Thursday},
+		{oneWeek[4], Friday},
+		{oneWeek[5], Saturday},
+		{oneWeek[6], Sunday},
+	}
+	for _, each := range testcases {
+		t.Run(each.date.String(), func(t *testing.T) {
+			got := each.date.Weekday()
+			if got != each.dayOfWeek {
+				t.Errorf("got: %v, want: %v", got, each.dayOfWeek)
+			}
+		})
+	}
+}
+
 func TestDate_Workdays(t *testing.T) {
-	for i, date := range oneWeek {
-		got := date.Workdays()
-		if !reflect.DeepEqual(got, workdays) {
-			t.Errorf("%s, got: %v, want: %v", Weekday(i), got, workdays)
-		}
+	for _, dayOfWeek := range oneWeek {
+		t.Run(dayOfWeek.String(), func(t *testing.T) {
+			got := dayOfWeek.Workdays()
+			if !reflect.DeepEqual(got, workdays) {
+				t.Errorf("%s, got: %v, want: %v", dayOfWeek, got, workdays)
+			}
+		})
 	}
 }
 
