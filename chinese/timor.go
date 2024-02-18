@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/youngzhu/godate"
+	"io"
+	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // 通过 https://timor.tech/api/holiday/{year} 获取数据
@@ -26,6 +29,10 @@ type timorResult struct {
 type timorFetcher struct{}
 
 func (f timorFetcher) Fetch(year string) (cnDateSlice, cnDateSlice, error) {
+	if val, ok := timorData[year]; ok {
+		log.Println("预处理数据")
+		return readFromJson(strings.NewReader(val))
+	}
 	// 先从本地获取
 	holidays, workdays, err := readFromLocal(year)
 	if err == nil {
@@ -37,23 +44,11 @@ func (f timorFetcher) Fetch(year string) (cnDateSlice, cnDateSlice, error) {
 	return nil, nil, fmt.Errorf("暂未实现")
 }
 
-const rootPath = "data/timor"
-
-func readFromLocal(year string) (cnDateSlice, cnDateSlice, error) {
-	// Open the file.
-	file, err := os.Open(filepath.Join(rootPath, year+".json"))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// Schedule the file to be closed once
-	// the function returns.
-	defer file.Close()
-
+func readFromJson(jsonContent io.Reader) (cnDateSlice, cnDateSlice, error) {
 	// Decode the file into a slice of pointers
 	// to timorResult values.
 	var result *timorResult
-	err = json.NewDecoder(file).Decode(&result)
+	err := json.NewDecoder(jsonContent).Decode(&result)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -75,4 +70,20 @@ func readFromLocal(year string) (cnDateSlice, cnDateSlice, error) {
 
 	// We don't need to check for errors, the caller can do this.
 	return holidays, extWorkdays, err
+}
+
+const rootPath = "data/timor"
+
+func readFromLocal(year string) (cnDateSlice, cnDateSlice, error) {
+	// Open the file.
+	file, err := os.Open(filepath.Join(rootPath, year+".json"))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Schedule the file to be closed once
+	// the function returns.
+	defer file.Close()
+
+	return readFromJson(file)
 }
