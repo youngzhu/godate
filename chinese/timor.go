@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"github.com/youngzhu/godate"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // 通过 https://timor.tech/api/holiday/{year} 获取数据
@@ -30,10 +28,10 @@ type timorResult struct {
 type timorFetcher struct{}
 
 func (f timorFetcher) Fetch(year string) (cnDateSlice, cnDateSlice, error) {
-	if val, ok := timorData[year]; ok {
-		log.Println("预处理数据")
-		return readFromJson(strings.NewReader(val))
-	}
+	//if val, ok := timorData[year]; ok {
+	//	log.Println("预处理数据")
+	//	return readFromJson(strings.NewReader(val))
+	//}
 	var holidays, workdays cnDateSlice
 
 	// 先从本地获取
