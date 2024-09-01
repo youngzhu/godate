@@ -6,6 +6,7 @@ import (
 	"github.com/youngzhu/godate"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -33,13 +34,26 @@ func (f timorFetcher) Fetch(year string) (cnDateSlice, cnDateSlice, error) {
 		log.Println("预处理数据")
 		return readFromJson(strings.NewReader(val))
 	}
+	var holidays, workdays cnDateSlice
+
 	// 先从本地获取
-	holidays, workdays, err := readFromLocal(year)
-	if err == nil {
-		return holidays, workdays, nil
-	}
+	//holidays, workdays, err := readFromLocal(year)
+	//if err == nil {
+	//	return holidays, workdays, nil
+	//}
 
 	// 通过API获取
+	// https://cdn.jsdelivr.net/gh/user/repo@version/file
+	// https://cdn.jsdelivr.net/gh/youngzhu/haohanbang/wodc/2024.json
+	// https://github.com/youngzhu/haohanbang/blob/main/wodc/2024.json
+	url := fmt.Sprintf("https://cdn.jsdelivr.net/gh/youngzhu/haohanbang/wodc/%s.json", year)
+	resp, err := http.Get(url)
+	if err == nil {
+		holidays, workdays, err = readFromJson(resp.Body)
+		if err == nil {
+			return holidays, workdays, nil
+		}
+	}
 
 	return nil, nil, fmt.Errorf("暂未实现")
 }

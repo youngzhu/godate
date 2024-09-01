@@ -26,7 +26,7 @@ func TestTimor_readFromLocal(t *testing.T) {
 
 func TestTimorFetcher_Fetch(t *testing.T) {
 	_timorFetcher := timorFetcher{}
-	holidays, workdays, err := _timorFetcher.Fetch("2023")
+	holidays, workdays, err := _timorFetcher.Fetch("2025")
 
 	if err != nil {
 		t.Error(err)
