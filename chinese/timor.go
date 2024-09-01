@@ -43,9 +43,7 @@ func (f timorFetcher) Fetch(year string) (cnDateSlice, cnDateSlice, error) {
 	//}
 
 	// 通过API获取
-	// https://cdn.jsdelivr.net/gh/user/repo@version/file
-	// https://cdn.jsdelivr.net/gh/youngzhu/haohanbang/wodc/2024.json
-	// https://github.com/youngzhu/haohanbang/blob/main/wodc/2024.json
+
 	url := fmt.Sprintf("https://cdn.jsdelivr.net/gh/youngzhu/haohanbang/wodc/%s.json", year)
 	resp, err := http.Get(url)
 	if err == nil {
