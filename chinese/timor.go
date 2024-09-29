@@ -2,12 +2,14 @@ package chinese
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/youngzhu/godate"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 // 通过 https://timor.tech/api/holiday/{year} 获取数据
@@ -28,6 +30,11 @@ type timorResult struct {
 type timorFetcher struct{}
 
 func (f timorFetcher) Fetch(year string) (cnDateSlice, cnDateSlice, error) {
+	yearInt, _ := strconv.Atoi(year)
+	if yearInt < 2024 {
+		return nil, nil, errors.New("往事不可追！")
+	}
+
 	//if val, ok := timorData[year]; ok {
 	//	log.Println("预处理数据")
 	//	return readFromJson(strings.NewReader(val))
