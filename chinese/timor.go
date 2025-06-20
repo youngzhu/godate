@@ -58,7 +58,7 @@ func (f timorFetcher) Fetch(year string) (cnDateSlice, cnDateSlice, error) {
 		}
 	}
 
-	return nil, nil, fmt.Errorf("暂未实现")
+	return nil, nil, err
 }
 
 func readFromJson(jsonContent io.Reader) (cnDateSlice, cnDateSlice, error) {
