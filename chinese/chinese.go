@@ -39,13 +39,14 @@ func newChineseDate() *chineseDate {
 
 // 不要这个了
 // 引用这个包的项目也会执行，如果报错，单元测试都走不下去
-//func init() {
-//	cd = newChineseDate()
-//
-//	fetcher = timorFetcher{}
-//
-//	GetHolidays(godate.Today().Year())
-//}
+// v0.7.5 还是得放开，这些都是默认行为
+func init() {
+	cd = newChineseDate()
+
+	fetcher = timorFetcher{}
+
+	GetHolidays(godate.Today().Year())
+}
 
 // 校验是否有数据
 // 如果没有，则获取并填充
