@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/youngzhu/godate"
 	"io"
+	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 )
@@ -42,14 +42,17 @@ func (f timorFetcher) Fetch(year string) (cnDateSlice, cnDateSlice, error) {
 	var holidays, workdays cnDateSlice
 
 	// 先从本地获取
-	//holidays, workdays, err := readFromLocal(year)
-	//if err == nil {
-	//	return holidays, workdays, nil
-	//}
+	holidays, workdays, err := readFromLocal(year)
+	if err == nil {
+		return holidays, workdays, nil
+	} else {
+		log.Printf("读取本地数据失败: %v \n", err)
+	}
 
 	// 通过API获取
 
-	url := fmt.Sprintf("https://cdn.jsdelivr.net/gh/youngzhu/haohanbang/wodc/%s.json", year)
+	//url := fmt.Sprintf("https://cdn.jsdelivr.net/gh/youngzhu/haohanbang/wodc/%s.json", year)
+	url := fmt.Sprintf("https://fastly.jsdelivr.net/gh/youngzhu/haohanbang/wodc/%s.json", year)
 	resp, err := http.Get(url)
 	if err == nil {
 		holidays, workdays, err = readFromJson(resp.Body)
@@ -93,7 +96,8 @@ const rootPath = "data/timor"
 
 func readFromLocal(year string) (cnDateSlice, cnDateSlice, error) {
 	// Open the file.
-	file, err := os.Open(filepath.Join(rootPath, year+".json"))
+	//file, err := os.Open(filepath.Join(rootPath, year+".json"))
+	file, err := LocalResources.Open(filepath.Join(rootPath, year+".json"))
 	if err != nil {
 		return nil, nil, err
 	}
