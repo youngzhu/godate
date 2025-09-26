@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/youngzhu/godate"
 	"io"
-	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -42,12 +41,12 @@ func (f timorFetcher) Fetch(year string) (cnDateSlice, cnDateSlice, error) {
 	var holidays, workdays cnDateSlice
 
 	// 先从本地获取
-	holidays, workdays, err := readFromLocal(year)
-	if err == nil {
-		return holidays, workdays, nil
-	} else {
-		log.Printf("读取本地数据失败: %v \n", err)
-	}
+	//holidays, workdays, err := readFromLocal(year)
+	//if err == nil {
+	//	return holidays, workdays, nil
+	//} else {
+	//	log.Printf("读取本地数据失败: %v \n", err)
+	//}
 
 	// 通过API获取
 
