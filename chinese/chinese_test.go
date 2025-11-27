@@ -47,6 +47,9 @@ func TestIsWorkDayInChina(t *testing.T) {
 		{godate.MustDate(2024, 2, 9), true},
 		{godate.MustDate(2024, 2, 17), false},
 		{godate.MustDate(2024, 2, 18), true},
+		{godate.MustDate(2026, 1, 1), false},
+		{godate.MustDate(2026, 1, 3), false},
+		{godate.MustDate(2026, 1, 4), true},
 	}
 
 	for _, testcase := range testCases {
