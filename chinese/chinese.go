@@ -114,3 +114,42 @@ func IsWorkDayInChina(d godate.Date) bool {
 
 	return !IsOffDayInChina(d)
 }
+
+// Offday 节假日（休息日）
+type Offday struct {
+	Date godate.Date
+	Name string // 节假日名称
+}
+
+// GetOffdaysOfYear 获取某一年度的节假日数据
+func GetOffdaysOfYear(year int) ([]Offday, error) {
+	nextYear := year + 1
+
+	return GetOffdaysByRange(strconv.Itoa(year)+"-01-01", strconv.Itoa(nextYear)+"-01-01")
+}
+
+// GetOffdaysByRange 获取某一段时间内的节假日数据，包括周末
+// 包含 start
+// 不包含 end
+func GetOffdaysByRange(start, end string) ([]Offday, error) {
+	startDate, err := godate.Parse(start)
+	if err != nil {
+		return nil, err
+	}
+	endDate, err := godate.Parse(end)
+	if err != nil {
+		return nil, err
+	}
+
+	var offdays []Offday
+
+	for d := startDate; d.Before(endDate); d = d.AddDaySafe(1) {
+		if IsOffDayInChina(d) {
+			offdays = append(offdays, Offday{
+				Date: d,
+			})
+		}
+	}
+
+	return offdays, nil
+}

@@ -1,9 +1,12 @@
-package godate
+package godate_test
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/youngzhu/godate"
+)
 
 func ExampleDate_StringCN() {
-	date := MustDate(2023, 10, 18)
+	date := godate.MustDate(2023, 10, 18)
 	s := date.StringCN()
 	fmt.Println(s)
 
@@ -12,7 +15,7 @@ func ExampleDate_StringCN() {
 }
 
 func ExampleDate_FullStringCN() {
-	date := MustDate(2023, 10, 18)
+	date := godate.MustDate(2023, 10, 18)
 	s := date.FullStringCN()
 	fmt.Println(s)
 

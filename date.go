@@ -87,6 +87,11 @@ func (d Date) AddDay(days int) (Date, error) {
 	}
 }
 
+func (d Date) AddDaySafe(days int) Date {
+	addedDate, _ := d.AddDay(days)
+	return addedDate
+}
+
 // SubDay returns the date d-days.
 func (d Date) SubDay(days int) (Date, error) {
 	switch {
