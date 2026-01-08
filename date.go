@@ -14,13 +14,21 @@ const (
 
 type Date struct {
 	time.Time
+	Name          string // 日期描述，如节假日、周末等
+	OffdayInChina bool   // 在中国是否为节假日
+}
+
+func newDate(d time.Time) Date {
+	return Date{
+		Time: d,
+	}
 }
 
 func today() Date {
 	now := time.Now()
 	// Truncate it to the beginning of the day (midnight)
 	d := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-	return Date{d}
+	return newDate(d)
 
 	//return Date{time.Now()}
 }
@@ -37,7 +45,7 @@ func NewDateYMD(year, month, day int) (Date, error) {
 	if err != nil {
 		return Date{}, err
 	}
-	return Date{date}, nil
+	return newDate(date), nil
 }
 
 func MustDate(year, month, day int) Date {
@@ -83,7 +91,7 @@ func (d Date) AddDay(days int) (Date, error) {
 	case days == 0:
 		return d, nil
 	default:
-		return Date{d.Time.Add(Day * time.Duration(days))}, nil
+		return newDate(d.Time.Add(Day * time.Duration(days))), nil
 	}
 }
 
@@ -100,7 +108,7 @@ func (d Date) SubDay(days int) (Date, error) {
 	case days == 0:
 		return d, nil
 	default:
-		return Date{d.Time.Add(Day * time.Duration(-days))}, nil
+		return newDate(d.Time.Add(Day * time.Duration(-days))), nil
 	}
 }
 

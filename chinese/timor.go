@@ -75,12 +75,14 @@ func readFromJson(jsonContent io.Reader) (cnDateSlice, cnDateSlice, error) {
 	holidays := make(cnDateSlice, 0, len(result.Holidays))
 	extWorkdays := make(cnDateSlice, 0, len(result.Holidays))
 
-	for _, day := range result.Holidays {
-		date, err := godate.Parse(day.Date)
+	for _, holiday := range result.Holidays {
+		date, err := godate.Parse(holiday.Date)
 		if err != nil {
 			return nil, nil, err
 		}
-		if day.Holiday {
+		date.OffdayInChina = holiday.Holiday
+		date.Name = holiday.Name
+		if holiday.Holiday {
 			holidays = append(holidays, date)
 		} else {
 			extWorkdays = append(extWorkdays, date)

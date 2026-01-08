@@ -24,6 +24,9 @@ type chineseDate struct {
 	// key: year
 	holidays    map[int]cnDateSlice
 	extWorkdays map[int]cnDateSlice
+
+	// key: 日期的字符串表示
+	metadata map[string]godate.Date
 }
 
 var cd *chineseDate
@@ -33,6 +36,8 @@ func newChineseDate() *chineseDate {
 
 	bc.holidays = make(map[int]cnDateSlice)
 	bc.extWorkdays = make(map[int]cnDateSlice)
+
+	bc.metadata = make(map[string]godate.Date)
 
 	return bc
 }
@@ -52,7 +57,7 @@ func init() {
 // 如果没有，则获取并填充
 func (c *chineseDate) check(year int) {
 	if _, ok := cd.holidays[year]; ok {
-		log.Println("cached:", year)
+		//log.Println("cached:", year)
 		return
 	}
 
@@ -67,6 +72,13 @@ func (c *chineseDate) check(year int) {
 
 	cd.holidays[year] = holidays
 	cd.extWorkdays[year] = extWorkdays
+
+	for _, holiday := range holidays {
+		cd.metadata[holiday.String()] = holiday
+	}
+	for _, workday := range extWorkdays {
+		cd.metadata[workday.String()] = workday
+	}
 }
 
 func GetHolidays(year int) []godate.Date {
@@ -121,8 +133,30 @@ type Offday struct {
 	Name string // 节假日名称
 }
 
+// enhance 对节假日进行增强
+func enhance(date godate.Date) godate.Date {
+	cd.check(date.Year())
+
+	var d godate.Date
+	var exists bool
+	if d, exists = cd.metadata[date.String()]; exists {
+		return d
+	}
+
+	// 处理周末
+	if date.IsWeekend() {
+		return godate.Date{
+			Time:          date.Time,
+			Name:          "周末",
+			OffdayInChina: true,
+		}
+	}
+
+	return date
+}
+
 // GetOffdaysOfYear 获取某一年度的节假日数据
-func GetOffdaysOfYear(year int) ([]Offday, error) {
+func GetOffdaysOfYear(year int) ([]godate.Date, error) {
 	nextYear := year + 1
 
 	return GetOffdaysByRange(strconv.Itoa(year)+"-01-01", strconv.Itoa(nextYear)+"-01-01")
@@ -131,7 +165,7 @@ func GetOffdaysOfYear(year int) ([]Offday, error) {
 // GetOffdaysByRange 获取某一段时间内的节假日数据，包括周末
 // 包含 start
 // 不包含 end
-func GetOffdaysByRange(start, end string) ([]Offday, error) {
+func GetOffdaysByRange(start, end string) ([]godate.Date, error) {
 	startDate, err := godate.Parse(start)
 	if err != nil {
 		return nil, err
@@ -141,13 +175,12 @@ func GetOffdaysByRange(start, end string) ([]Offday, error) {
 		return nil, err
 	}
 
-	var offdays []Offday
+	var offdays []godate.Date
 
 	for d := startDate; d.Before(endDate); d = d.AddDaySafe(1) {
-		if IsOffDayInChina(d) {
-			offdays = append(offdays, Offday{
-				Date: d,
-			})
+		enhanceDate := enhance(d)
+		if enhanceDate.OffdayInChina {
+			offdays = append(offdays, enhanceDate)
 		}
 	}
 
