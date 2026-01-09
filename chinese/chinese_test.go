@@ -2,6 +2,7 @@ package chinese
 
 import (
 	"github.com/youngzhu/godate"
+	"log"
 	"testing"
 	"time"
 )
@@ -94,10 +95,11 @@ func TestGetOffdaysByRange(t *testing.T) {
 func TestGetOffdaysOfYear_count(t *testing.T) {
 	offdays, _ := GetOffdaysOfYear(2026)
 
-	//for i, offday := range offdays {
-	//	// 打印一下
-	//	log.Println(i, offday)
-	//}
+	// 打印一下
+	for i, offday := range offdays {
+		log.Println(i, offday, offday.Name)
+	}
+
 	expectedOffdays := 117
 	if len(offdays) != expectedOffdays {
 		t.Fatalf("expected %d offdays, got %d", expectedOffdays, len(offdays))
