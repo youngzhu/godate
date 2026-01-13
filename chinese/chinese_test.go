@@ -4,7 +4,6 @@ import (
 	"github.com/youngzhu/godate"
 	"log"
 	"testing"
-	"time"
 )
 
 func TestIsOffDayInChina(t *testing.T) {
@@ -65,16 +64,18 @@ func TestIsWorkDayInChina(t *testing.T) {
 	}
 }
 
-func newDate(year, month, day int, name string) godate.Date {
-	return godate.Date{
-		Time: time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC),
+func newDate(year, month, day int, name string) CNDate {
+	date := godate.MustDate(year, month, day)
+
+	return CNDate{
+		Date: date,
 		Name: name,
 	}
 }
 
 func TestGetOffdaysByRange(t *testing.T) {
 	offdays, _ := GetOffdaysByRange("20260101", "20260111")
-	expectedOffdays := []godate.Date{
+	expectedOffdays := []CNDate{
 		newDate(2026, 1, 1, "元旦"),
 		newDate(2026, 1, 2, "元旦"),
 		newDate(2026, 1, 3, "元旦"),
@@ -86,7 +87,7 @@ func TestGetOffdaysByRange(t *testing.T) {
 	}
 
 	for i, d := range expectedOffdays {
-		if !offdays[i].IsTheSameDay(d) || offdays[i].Name != d.Name {
+		if !offdays[i].IsTheSameDay(d.Date) || offdays[i].Name != d.Name {
 			t.Errorf("expected offday %v(%s) at index %d, got %v(%s)", d, d.Name, i, offdays[i], offdays[i].Name)
 		}
 	}

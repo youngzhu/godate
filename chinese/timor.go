@@ -80,12 +80,16 @@ func readFromJson(jsonContent io.Reader) (cnDateSlice, cnDateSlice, error) {
 		if err != nil {
 			return nil, nil, err
 		}
-		date.OffdayInChina = holiday.Holiday
-		date.Name = holiday.Name
+
+		cnDate := CNDate{
+			Date:   date,
+			Offday: holiday.Holiday,
+			Name:   holiday.Name,
+		}
 		if holiday.Holiday {
-			holidays = append(holidays, date)
+			holidays = append(holidays, cnDate)
 		} else {
-			extWorkdays = append(extWorkdays, date)
+			extWorkdays = append(extWorkdays, cnDate)
 		}
 	}
 

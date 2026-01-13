@@ -14,8 +14,6 @@ const (
 
 type Date struct {
 	time.Time
-	Name          string // 日期描述，如节假日、周末等
-	OffdayInChina bool   // 在中国是否为节假日
 }
 
 func newDate(d time.Time) Date {

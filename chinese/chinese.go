@@ -9,7 +9,35 @@ import (
 // 中国特色的调休制度
 // TODO 从官方网站查询中国节假日和调休信息
 
-type cnDateSlice []godate.Date
+type CNDate struct {
+	godate.Date
+
+	Name   string // 日期描述，如节假日、周末等
+	Offday bool   // 在中国是否为节假日
+}
+
+func NewCNDate(date godate.Date) CNDate {
+	cd.check(date.Year())
+
+	var d CNDate
+	var exists bool
+	if d, exists = cd.metadata[date.String()]; exists {
+		return d
+	}
+
+	// 处理周末
+	if date.IsWeekend() {
+		return CNDate{
+			Date:   date,
+			Name:   "周末",
+			Offday: true,
+		}
+	}
+
+	return CNDate{Date: date}
+}
+
+type cnDateSlice []CNDate
 
 func (c cnDateSlice) test(date godate.Date) bool {
 	for _, d := range c {
@@ -26,7 +54,7 @@ type chineseDate struct {
 	extWorkdays map[int]cnDateSlice
 
 	// key: 日期的字符串表示
-	metadata map[string]godate.Date
+	metadata map[string]CNDate
 }
 
 var cd *chineseDate
@@ -37,7 +65,7 @@ func newChineseDate() *chineseDate {
 	bc.holidays = make(map[int]cnDateSlice)
 	bc.extWorkdays = make(map[int]cnDateSlice)
 
-	bc.metadata = make(map[string]godate.Date)
+	bc.metadata = make(map[string]CNDate)
 
 	return bc
 }
@@ -81,13 +109,13 @@ func (c *chineseDate) check(year int) {
 	}
 }
 
-func GetHolidays(year int) []godate.Date {
+func GetHolidays(year int) []CNDate {
 	cd.check(year)
 
 	return cd.holidays[year]
 }
 
-func GetExtWorkdays(year int) []godate.Date {
+func GetExtWorkdays(year int) []CNDate {
 	cd.check(year)
 
 	return cd.extWorkdays[year]
@@ -114,11 +142,13 @@ func IsExtWorkday(date godate.Date) bool {
 // 1. 工作日（周一至周五） 且 不是中国节假日
 // 2. 调班
 func IsOffDayInChina(d godate.Date) bool {
-	if IsHoliday(d) {
-		return true
-	}
+	//if IsHoliday(d) {
+	//	return true
+	//}
+	//
+	//return d.IsWeekend() && !IsExtWorkday(d)
 
-	return d.IsWeekend() && !IsExtWorkday(d)
+	return NewCNDate(d).Offday
 }
 
 // IsWorkDayInChina 在中国是否上班日
@@ -127,36 +157,30 @@ func IsWorkDayInChina(d godate.Date) bool {
 	return !IsOffDayInChina(d)
 }
 
-// Offday 节假日（休息日）
-type Offday struct {
-	Date godate.Date
-	Name string // 节假日名称
-}
-
 // enhance 对节假日进行增强
-func enhance(date godate.Date) godate.Date {
-	cd.check(date.Year())
-
-	var d godate.Date
-	var exists bool
-	if d, exists = cd.metadata[date.String()]; exists {
-		return d
-	}
-
-	// 处理周末
-	if date.IsWeekend() {
-		return godate.Date{
-			Time:          date.Time,
-			Name:          "周末",
-			OffdayInChina: true,
-		}
-	}
-
-	return date
-}
+//func enhance(date godate.Date) godate.Date {
+//	cd.check(date.Year())
+//
+//	var d godate.Date
+//	var exists bool
+//	if d, exists = cd.metadata[date.String()]; exists {
+//		return d
+//	}
+//
+//	// 处理周末
+//	if date.IsWeekend() {
+//		return godate.Date{
+//			Time:          date.Time,
+//			Name:          "周末",
+//			OffdayInChina: true,
+//		}
+//	}
+//
+//	return date
+//}
 
 // GetOffdaysOfYear 获取某一年度的节假日数据
-func GetOffdaysOfYear(year int) ([]godate.Date, error) {
+func GetOffdaysOfYear(year int) ([]CNDate, error) {
 	nextYear := year + 1
 
 	return GetOffdaysByRange(strconv.Itoa(year)+"-01-01", strconv.Itoa(nextYear)+"-01-01")
@@ -165,7 +189,7 @@ func GetOffdaysOfYear(year int) ([]godate.Date, error) {
 // GetOffdaysByRange 获取某一段时间内的节假日数据，包括周末
 // 包含 start
 // 不包含 end
-func GetOffdaysByRange(start, end string) ([]godate.Date, error) {
+func GetOffdaysByRange(start, end string) ([]CNDate, error) {
 	startDate, err := godate.Parse(start)
 	if err != nil {
 		return nil, err
@@ -175,11 +199,11 @@ func GetOffdaysByRange(start, end string) ([]godate.Date, error) {
 		return nil, err
 	}
 
-	var offdays []godate.Date
+	var offdays []CNDate
 
 	for d := startDate; d.Before(endDate); d = d.AddDaySafe(1) {
-		enhanceDate := enhance(d)
-		if enhanceDate.OffdayInChina {
+		enhanceDate := NewCNDate(d)
+		if enhanceDate.Offday {
 			offdays = append(offdays, enhanceDate)
 		}
 	}
