@@ -108,6 +108,44 @@ func TestGetOffdaysOfYear_count(t *testing.T) {
 
 }
 
+func TestCNDate_String(t *testing.T) {
+	today := NewCNDate(godate.Today())
+	log.Println(today.String())
+}
+
+func TestCNDate_AddDay(t *testing.T) {
+	day1231 := NewCNDate(godate.MustDate(2025, 12, 31))
+	day0101, _ := day1231.AddDay(1)
+
+	wantName := "元旦"
+	wantOffday := true
+	if day0101.Name != wantName {
+		t.Errorf("expected name %s, got %s", wantName, day0101.Name)
+	}
+	if day0101.Offday != wantOffday {
+		t.Errorf("expected offday %v, got %v", wantOffday, day0101.Offday)
+	}
+
+	//today := NewCNDate(godate.Today())
+	//tomorrow, _ := today.AddDay(1)
+	//
+	//log.Printf("today: %v, tomorrow: %v", today, tomorrow)
+}
+
+func TestCNDate_NextDay(t *testing.T) {
+	day1231 := NewCNDate(godate.MustDate(2025, 12, 31))
+	day0101 := day1231.NextDay()
+
+	wantName := "元旦"
+	wantOffday := true
+	if day0101.Name != wantName {
+		t.Errorf("expected name %s, got %s", wantName, day0101.Name)
+	}
+	if day0101.Offday != wantOffday {
+		t.Errorf("expected offday %v, got %v", wantOffday, day0101.Offday)
+	}
+}
+
 // func TestTimorFetcher_Fetch_fail(t *testing.T) {
 // 	GetHolidays(2023)
 // }

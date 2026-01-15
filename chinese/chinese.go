@@ -37,6 +37,20 @@ func NewCNDate(date godate.Date) CNDate {
 	return CNDate{Date: date}
 }
 
+func (d CNDate) AddDay(days int) (CNDate, error) {
+	newDate, err := d.Date.AddDay(days)
+	if err != nil {
+		return CNDate{}, err
+	}
+	return NewCNDate(newDate), nil
+
+}
+
+func (d CNDate) NextDay() CNDate {
+	nextDay, _ := d.AddDay(1)
+	return nextDay
+}
+
 type cnDateSlice []CNDate
 
 func (c cnDateSlice) test(date godate.Date) bool {
