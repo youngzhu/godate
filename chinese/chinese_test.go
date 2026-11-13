@@ -24,7 +24,8 @@ func TestIsOffDayInChina(t *testing.T) {
 		{godate.MustDate(2024, 2, 17), true},
 		{godate.MustDate(2024, 2, 18), false},
 		{godate.MustDate(2025, 1, 1), true},
-		{godate.MustDate(2025, 10, 1), false},
+		{godate.MustDate(2025, 10, 1), true},
+		{godate.MustDate(2027, 1, 1), true},
 	}
 
 	for _, testcase := range testCases {
